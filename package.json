@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-quizell",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "n8n community node for Quizell — trigger workflows on quiz and lead events",
 	"license": "MIT",
 	"keywords": [
@@ -25,12 +25,12 @@
 		"prepublishOnly": "npm run build"
 	},
 	"files": [
-    "dist",
-    "!dist/tsconfig.tsbuildinfo",
-    "!dist/package.json",
-    "README.md",
-    "LICENSE.md"
-],
+		"dist",
+		"!dist/tsconfig.tsbuildinfo",
+		"!dist/package.json",
+		"README.md",
+		"LICENSE.md"
+	],
 	"n8n": {
 		"n8nNodesApiVersion": 1,
 		"strict": true,
