@@ -28,7 +28,6 @@ export class QuizellTrigger implements INodeType {
 				name: 'default',
 				httpMethod: 'POST',
 				responseMode: 'onReceived',
-				// path: 'webhook',
 				path: '/',
 			},
 		],
@@ -58,7 +57,7 @@ export class QuizellTrigger implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
-						event: ['quiz.completed', 'lead.captured'],
+						event: ['lead.captured'],
 					},
 				},
 			},
@@ -67,7 +66,6 @@ export class QuizellTrigger implements INodeType {
 
 	webhookMethods = {
 		default: {
-			// Check if webhook already exists in Quizell
 			async checkExists(this: IHookFunctions): Promise<boolean> {
 				const webhookData = this.getWorkflowStaticData('node');
 				if (!webhookData.webhookId) return false;
@@ -75,11 +73,10 @@ export class QuizellTrigger implements INodeType {
 				const credentials = await this.getCredentials('quizellApi');
 
 				try {
-					await this.helpers.request({
+					await this.helpers.httpRequest({
 						method: 'GET',
 						url: `${credentials.baseUrl}/api/n8n/webhooks/${webhookData.webhookId}`,
 						headers: { Authorization: `Bearer ${credentials.apiKey}` },
-						json: true,
 					});
 					return true;
 				} catch {
@@ -87,33 +84,34 @@ export class QuizellTrigger implements INodeType {
 				}
 			},
 
-			// Register webhook in Quizell when workflow is activated
 			async create(this: IHookFunctions): Promise<boolean> {
-    const webhookUrl = this.getNodeWebhookUrl('default');
-    const event = this.getNodeParameter('event') as string;
-    const quiz_key = this.getNodeParameter('quiz_key') as string;
-    const credentials = await this.getCredentials('quizellApi');
-    const webhookData = this.getWorkflowStaticData('node');
+				const webhookUrl = this.getNodeWebhookUrl('default');
+				const event = this.getNodeParameter('event') as string;
+				const quiz_key = this.getNodeParameter('quiz_key') as string;
+				const credentials = await this.getCredentials('quizellApi');
+				const webhookData = this.getWorkflowStaticData('node');
 
-    const response = await this.helpers.request({
-        method: 'POST',
-        url: `${credentials.baseUrl}/api/n8n/webhooks`,
-        headers: { Authorization: `Bearer ${credentials.apiKey}` },
-        body: { url: webhookUrl, event, quiz_key },
-        json: true,
-    });
+				const response = await this.helpers.httpRequest({
+					method: 'POST',
+					url: `${credentials.baseUrl}/api/n8n/webhooks`,
+					headers: {
+						Authorization: `Bearer ${credentials.apiKey}`,
+						'Content-Type': 'application/json',
+					},
+					body: { url: webhookUrl, event, quiz_key },
+					json: true,
+				});
 
-    
+				webhookData.webhookId = response.id;
 
-    webhookData.webhookId = response.id;
-    if (!response.secret) {
-        throw new Error('Quizell API did not return a webhook secret. Cannot securely receive events.');
-    }
-    webhookData.webhookSecret = response.secret;
-    return true;
-},
+				if (!response.secret) {
+					throw new Error('Quizell API did not return a webhook secret. Cannot securely receive events.');
+				}
 
-			// Unregister webhook when workflow is deactivated
+				webhookData.webhookSecret = response.secret;
+				return true;
+			},
+
 			async delete(this: IHookFunctions): Promise<boolean> {
 				const credentials = await this.getCredentials('quizellApi');
 				const webhookData = this.getWorkflowStaticData('node');
@@ -121,11 +119,10 @@ export class QuizellTrigger implements INodeType {
 				if (!webhookData.webhookId) return true;
 
 				try {
-					await this.helpers.request({
+					await this.helpers.httpRequest({
 						method: 'DELETE',
 						url: `${credentials.baseUrl}/api/n8n/webhooks/${webhookData.webhookId}`,
 						headers: { Authorization: `Bearer ${credentials.apiKey}` },
-						json: true,
 					});
 					webhookData.webhookId = undefined;
 					webhookData.webhookSecret = undefined;
@@ -135,24 +132,19 @@ export class QuizellTrigger implements INodeType {
 				return true;
 			},
 		},
-
-
 	};
 
+	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
+		const body = this.getBodyData();
+		const headers = this.getHeaderData();
+		const webhookData = this.getWorkflowStaticData('node');
 
-async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
-    const body = this.getBodyData();
-    const headers = this.getHeaderData();
-    const webhookData = this.getWorkflowStaticData('node');
+		if (webhookData.webhookSecret && headers['x-quizell-secret'] !== webhookData.webhookSecret) {
+			return { noWebhookResponse: true };
+		}
 
-    // Skip secret validation if no secret stored (test mode)
-    if (webhookData.webhookSecret && headers['x-quizell-secret'] !== webhookData.webhookSecret) {
-
-        return { noWebhookResponse: true };
-    }
-
-    return {
-        workflowData: [this.helpers.returnJsonArray(body)],
-    };
-}
+		return {
+			workflowData: [this.helpers.returnJsonArray(body)],
+		};
+	}
 }
