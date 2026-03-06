@@ -8,7 +8,7 @@ class QuizellApi {
         this.documentationUrl = 'https://docs.quizell.com/';
         this.properties = [
             {
-                displayName: 'API Key',
+                displayName: 'API TOKEN',
                 name: 'apiKey',
                 type: 'string',
                 typeOptions: { password: true },
@@ -20,7 +20,7 @@ class QuizellApi {
                 displayName: 'Base URL',
                 name: 'baseUrl',
                 type: 'string',
-                default: 'https://testapi.quizell.com',
+                default: 'https://api.quizell.com',
                 required: true,
             },
         ];

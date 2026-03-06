@@ -11,7 +11,7 @@ export class QuizellApi implements ICredentialType {
 	documentationUrl = 'https://docs.quizell.com/'; // update with real URL
 	properties: INodeProperties[] = [
 		{
-			displayName: 'API Key',
+			displayName: 'API TOKEN',
 			name: 'apiKey',
 			type: 'string',
 			typeOptions: { password: true },
@@ -23,7 +23,7 @@ export class QuizellApi implements ICredentialType {
 			displayName: 'Base URL',
 			name: 'baseUrl',
 			type: 'string',
-			default: 'https://testapi.quizell.com',
+			default: 'https://api.quizell.com',
 			required: true,
 		},
 	];
