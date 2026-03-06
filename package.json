@@ -7,13 +7,13 @@
 		"n8n-community-node-package"
 	],
 	"homepage": "https://quizell.com",
-  "author": {
-    "name": "Quizell",
-    "email": "support@quizell.com"
-  },
+	"author": {
+		"name": "Quizell",
+		"email": "support@quizell.com"
+	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Quizell-official/n8n-nodes-quizell.git"
+		"url": "git+https://github.com/Quizell-official/n8n-nodes-quizell.git"
 	},
 	"scripts": {
 		"build": "n8n-node build",
@@ -22,22 +22,24 @@
 		"lint": "n8n-node lint",
 		"lint:fix": "n8n-node lint --fix",
 		"release": "n8n-node release",
-		"prepublishOnly": "n8n-node prerelease"
+		"prepublishOnly": "npm run build"
 	},
 	"files": [
-		"dist",
-		 "README.md",
+    "dist",
+    "!dist/tsconfig.tsbuildinfo",
+    "!dist/package.json",
+    "README.md",
     "LICENSE.md"
-	],
+],
 	"n8n": {
 		"n8nNodesApiVersion": 1,
 		"strict": true,
-		 "credentials": [
-        "dist/credentials/QuizellApi.credentials.js"
-    ],
-    "nodes": [
-        "dist/nodes/QuizellTrigger/QuizellTrigger.node.js"
-    ]
+		"credentials": [
+			"dist/credentials/QuizellApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/QuizellTrigger/QuizellTrigger.node.js"
+		]
 	},
 	"devDependencies": {
 		"@n8n/node-cli": "*",
