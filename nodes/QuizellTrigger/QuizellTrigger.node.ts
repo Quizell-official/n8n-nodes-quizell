@@ -4,6 +4,7 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	IWebhookResponseData,
+	NodeOperationError,
 } from 'n8n-workflow';
 
 export class QuizellTrigger implements INodeType {
@@ -105,7 +106,7 @@ export class QuizellTrigger implements INodeType {
 				webhookData.webhookId = response.id;
 
 				if (!response.secret) {
-					throw new Error('Quizell API did not return a webhook secret. Cannot securely receive events.');
+					throw new NodeOperationError(this.getNode(), 'Quizell API did not return a webhook secret. Cannot securely receive events.');
 				}
 
 				webhookData.webhookSecret = response.secret;
