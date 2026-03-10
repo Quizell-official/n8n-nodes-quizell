@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-quizell",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "n8n community node for Quizell — trigger workflows on quiz and lead events",
 	"license": "MIT",
 	"keywords": [
