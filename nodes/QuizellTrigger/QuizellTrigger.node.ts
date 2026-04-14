@@ -1,9 +1,13 @@
-import {
+import type {
 	IHookFunctions,
 	IWebhookFunctions,
 	INodeType,
 	INodeTypeDescription,
 	IWebhookResponseData,
+	JsonObject,
+} from 'n8n-workflow';
+import {
+	NodeApiError,
 	NodeOperationError,
 } from 'n8n-workflow';
 
@@ -15,6 +19,7 @@ export class QuizellTrigger implements INodeType {
 		group: ['trigger'],
 		version: 1,
 		description: 'Starts the workflow on Quizell events like Quiz Completed or Lead Captured',
+		usableAsTool: true,
 		defaults: { name: 'Quizell Trigger' },
 		inputs: [],
 		outputs: ['main'],
@@ -54,7 +59,7 @@ export class QuizellTrigger implements INodeType {
 				type: 'string',
 				default: 'all',
 				placeholder: 'all',
-				description: 'Use "all" to receive events for all quizzes, or provide a specific Quiz ID.',
+				description: 'Use "all" to receive events for all quizzes, or provide a specific Quiz ID',
 				required: true,
 				displayOptions: {
 					show: {
@@ -74,10 +79,9 @@ export class QuizellTrigger implements INodeType {
 				const credentials = await this.getCredentials('quizellApi');
 
 				try {
-					await this.helpers.httpRequest({
+					await this.helpers.httpRequestWithAuthentication.call(this, 'quizellApi', {
 						method: 'GET',
 						url: `${credentials.baseUrl}/api/n8n/webhooks/${webhookData.webhookId}`,
-						headers: { Authorization: `Bearer ${credentials.apiKey}` },
 					});
 					return true;
 				} catch {
@@ -92,16 +96,17 @@ export class QuizellTrigger implements INodeType {
 				const credentials = await this.getCredentials('quizellApi');
 				const webhookData = this.getWorkflowStaticData('node');
 
-				const response = await this.helpers.httpRequest({
-					method: 'POST',
-					url: `${credentials.baseUrl}/api/n8n/webhooks`,
-					headers: {
-						Authorization: `Bearer ${credentials.apiKey}`,
-						'Content-Type': 'application/json',
-					},
-					body: { url: webhookUrl, event, quiz_key },
-					json: true,
-				});
+				let response;
+				try {
+					response = await this.helpers.httpRequestWithAuthentication.call(this, 'quizellApi', {
+						method: 'POST',
+						url: `${credentials.baseUrl}/api/n8n/webhooks`,
+						body: { url: webhookUrl, event, quiz_key },
+						json: true,
+					});
+				} catch (error) {
+					throw new NodeApiError(this.getNode(), error as JsonObject);
+				}
 
 				webhookData.webhookId = response.id;
 
@@ -120,15 +125,14 @@ export class QuizellTrigger implements INodeType {
 				if (!webhookData.webhookId) return true;
 
 				try {
-					await this.helpers.httpRequest({
+					await this.helpers.httpRequestWithAuthentication.call(this, 'quizellApi', {
 						method: 'DELETE',
 						url: `${credentials.baseUrl}/api/n8n/webhooks/${webhookData.webhookId}`,
-						headers: { Authorization: `Bearer ${credentials.apiKey}` },
 					});
 					webhookData.webhookId = undefined;
 					webhookData.webhookSecret = undefined;
-				} catch {
-					return false;
+				} catch (error) {
+					throw new NodeApiError(this.getNode(), error as JsonObject);
 				}
 				return true;
 			},

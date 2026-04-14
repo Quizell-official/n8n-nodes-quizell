@@ -14,7 +14,6 @@ in the n8n community nodes documentation.
 
 ## Operations
 
-- **Quiz Completed** — triggers when a user completes a quiz
 - **Lead Captured** — triggers when a new lead is captured via a quiz
 
 ## Credentials

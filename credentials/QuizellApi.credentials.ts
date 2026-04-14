@@ -1,3 +1,4 @@
+import type { Icon } from 'n8n-workflow';
 import {
 	IAuthenticateGeneric,
 	ICredentialTestRequest,
@@ -8,7 +9,8 @@ import {
 export class QuizellApi implements ICredentialType {
 	name = 'quizellApi';
 	displayName = 'Quizell API';
-	documentationUrl = 'https://docs.quizell.com/'; // update with real URL
+	icon: Icon = 'file:quizell.svg';
+	documentationUrl = 'https://docs.quizell.com/';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API TOKEN',
@@ -42,7 +44,7 @@ export class QuizellApi implements ICredentialType {
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials.baseUrl}}',
-			url: '/api/n8n/verify',  // we'll build this PHP endpoint later
+			url: '/api/n8n/verify',
 			method: 'GET',
 		},
 	};
