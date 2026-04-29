@@ -2,7 +2,7 @@
 	"node": "n8n-nodes-quizell.quizellTrigger",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
-	"categories": ["Marketing","E-Commerce"],
+	"categories": ["Marketing & Content","Analytics"],
 	"resources": {
 		"credentialDocumentation": [
 			{

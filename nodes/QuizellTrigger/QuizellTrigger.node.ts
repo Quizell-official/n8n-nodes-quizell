@@ -9,6 +9,7 @@ import type {
 import {
 	NodeApiError,
 	NodeOperationError,
+	NodeConnectionTypes
 } from 'n8n-workflow';
 
 export class QuizellTrigger implements INodeType {
@@ -18,11 +19,11 @@ export class QuizellTrigger implements INodeType {
 		icon: 'file:quizell.svg',
 		group: ['trigger'],
 		version: 1,
-		description: 'Starts the workflow on Quizell events like Quiz Completed or Lead Captured',
+		description: 'Starts the workflow when a new lead is captured via a Quizell quiz',
 		usableAsTool: true,
 		defaults: { name: 'Quizell Trigger' },
 		inputs: [],
-		outputs: ['main'],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'quizellApi',
@@ -84,8 +85,12 @@ export class QuizellTrigger implements INodeType {
 						url: `${credentials.baseUrl}/api/n8n/webhooks/${webhookData.webhookId}`,
 					});
 					return true;
-				} catch {
-					return false;
+				} catch (error) {
+					const statusCode = (error as { response?: { status?: number }; statusCode?: number })
+						.response?.status ??
+						(error as { statusCode?: number }).statusCode;
+					if (statusCode === 404) return false;
+					throw new NodeApiError(this.getNode(), error as JsonObject);
 				}
 			},
 
