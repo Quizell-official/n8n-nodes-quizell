@@ -20,7 +20,6 @@ export class QuizellTrigger implements INodeType {
 		group: ['trigger'],
 		version: 1,
 		description: 'Starts the workflow when a new lead is captured via a Quizell quiz',
-		usableAsTool: true,
 		defaults: { name: 'Quizell Trigger' },
 		inputs: [],
 		outputs: [NodeConnectionTypes.Main],
@@ -56,7 +55,7 @@ export class QuizellTrigger implements INodeType {
 			},
 			{
 				displayName: 'Quiz Key (Quiz ID)',
-				name: 'quiz_key',
+				name: 'quizKey',
 				type: 'string',
 				default: 'all',
 				placeholder: 'all',
@@ -97,7 +96,7 @@ export class QuizellTrigger implements INodeType {
 			async create(this: IHookFunctions): Promise<boolean> {
 				const webhookUrl = this.getNodeWebhookUrl('default');
 				const event = this.getNodeParameter('event') as string;
-				const quiz_key = this.getNodeParameter('quiz_key') as string;
+				const quizKey = this.getNodeParameter('quizKey') as string;
 				const credentials = await this.getCredentials('quizellApi');
 				const webhookData = this.getWorkflowStaticData('node');
 
@@ -106,7 +105,7 @@ export class QuizellTrigger implements INodeType {
 					response = await this.helpers.httpRequestWithAuthentication.call(this, 'quizellApi', {
 						method: 'POST',
 						url: `${credentials.baseUrl}/api/n8n/webhooks`,
-						body: { url: webhookUrl, event, quiz_key },
+						body: { url: webhookUrl, event, quiz_key:quizKey },
 						json: true,
 					});
 				} catch (error) {

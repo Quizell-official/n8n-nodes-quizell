@@ -1,5 +1,5 @@
 import type { Icon } from 'n8n-workflow';
-import {
+import type {
 	IAuthenticateGeneric,
 	ICredentialTestRequest,
 	ICredentialType,
@@ -13,7 +13,7 @@ export class QuizellApi implements ICredentialType {
 	documentationUrl = 'https://docs.quizell.com/';
 	properties: INodeProperties[] = [
 		{
-			displayName: 'API TOKEN',
+			displayName: 'API Key',
 			name: 'apiKey',
 			type: 'string',
 			typeOptions: { password: true },
