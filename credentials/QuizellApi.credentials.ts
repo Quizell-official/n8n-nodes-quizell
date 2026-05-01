@@ -1,5 +1,5 @@
-import type { Icon } from 'n8n-workflow';
 import type {
+	Icon,
 	IAuthenticateGeneric,
 	ICredentialTestRequest,
 	ICredentialType,

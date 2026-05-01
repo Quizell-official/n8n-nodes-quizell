@@ -12,6 +12,7 @@ import {
 	NodeConnectionTypes
 } from 'n8n-workflow';
 
+// eslint-disable-next-line @n8n/community-nodes/node-usable-as-tool
 export class QuizellTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Quizell Trigger',
